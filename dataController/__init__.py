@@ -1,14 +1,19 @@
 import os
 import json
-from typing import Any, Union
+from typing import Any, Union, List
 from .DataNode import DataNode
+from enum import Enum
+
+
+class __direction(Enum):
+    LEFT = True
+    RIGHT = False
 
 
 class database:
     __dirname: str = ""
     __dbName: Union[str, None] = None
     __root: Any = None
-    __tail: Any = None
 
     def __init__(self, dbName, baseRoot: str, generate=False):
         dirname = os.path.join(baseRoot, dbName)
@@ -38,18 +43,22 @@ class database:
             if file[-5:] == ".json":
                 with open(self.__dirname + "/" + file, "r") as jsonfile:
                     data = json.load(jsonfile)
-                    self.insert(data, file[:-5], False)
+                    self.insert(data, file[:-5])
 
-    def insert(self, data: dict, dataID: str, savefile=True):
+    def __rotate(self, direction: __direction, rotateRoot: DataNode):
+        pass
+
+    def __rebalance(self):
+        # TODO:rebalce
+        pass
+
+    def insert(self, data: dict, dataID: str) -> DataNode:
         if self.__dbName == None:
             print("Error : NULL DB")
             return "Error : NULL DB"
         node = DataNode(data, dataID, self.__dirname)
         if self.__root == None:
             self.__root = node
-            self.__tail = node
-            if savefile:
-                self.__root.commit()
             return
         instance = self.__root
         while True:
@@ -60,10 +69,6 @@ class database:
                 if instance.left == None:
                     instance.left = node
                     node.parent = instance
-                    if self.__tail == instance:
-                        self.tail = node
-                    if savefile:
-                        node.commit()
                     break
                 else:
                     instance = instance.left
@@ -71,38 +76,47 @@ class database:
                 if instance.right == None:
                     instance.right = node
                     node.parent = instance
-                    if instance == self.__tail or instance.left == self.__tail:
-                        self.__tail = node
-                    if savefile:
-                        node.commit()
                     break
                 else:
                     instance = instance.right
-        self.rebalance()
+        self.__rebalance()
+        return node
 
-    def delete(self, dataID: str):
+    def delete(self, data: Union(str, DataNode, None)):
         if self.__dbName == None:
             print("Error : NULL DB")
             return
-        if self.__root:
-            pass
-        # TODO:remove Node
-
+        elif data == None:
+            return
+        dataID: str = str(data)
         try:
-            self.rebalance()
             os.remove("/" + self.__dirname + "/" + dataID + ".json")
         except OSError:
-            print("Error : delete Data on fileSystem", self.__dbName, dataID)
+            print("Error : delete Data from fileSystem", self.__dbName, dataID)
+            return
+        if not isinstance(data, DataNode):
+            data = self.get_node(dataID)
+        while data.left != None and data.right != None:
+            if data.left != None:
+                self.__rotate(__direction.RIGHT, data)
+            elif data.right != None:
+                self.__rotate(__direction.LEFT, data)
+        parent = data.parent
+        if self.__root == data:
+            self.__root = None
+        elif parent.left == data:
+            parent.left = None
+        else:
+            parent.right = None
+        del data
+        self.__rebalance()
 
-    def rebalance(self):
-        # TODO:rebalce
-        pass
-
-    def getHead(self):
+    def get_root(self) -> Union[DataNode, None]:
         return self.__root
 
-    def getTail(self):
-        return self.__tail
+    def get_node(self, dataID: str) -> Union[DataNode, None]:
+        return None
+
 
     def drop(self):
         if self.__dbName == None:
