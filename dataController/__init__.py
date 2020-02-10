@@ -108,7 +108,7 @@ class database:
         self.__rebalance()
         return node
 
-    def delete(self, data: Union(str, DataNode, None)):
+    def delete(self, data: Union(str, DataNode, None)) -> Union[str, None]:
         if self.__dbName == None:
             print("Error : NULL DB")
             return
@@ -118,8 +118,7 @@ class database:
         try:
             os.remove("/" + self.__dirname + "/" + dataID + ".json")
         except OSError:
-            print("Error : delete Data from fileSystem", self.__dbName, dataID)
-            return
+            return dataID
         if not isinstance(data, DataNode):
             data = self.get_node(dataID)
         while data.left != None and data.right != None:
@@ -136,6 +135,7 @@ class database:
             parent.right = None
         del data
         self.__rebalance()
+        return None
 
     def get_root(self) -> Union[DataNode, None]:
         return self.__root
@@ -155,6 +155,13 @@ class database:
                 node = node.right
         return None
 
+    # use dfs Search
+    def get_allNode(self) -> List[DataNode]:
+        stack = []
+        result = list()
+        instance: DataNode = self.__root
+        stack.append([instance, None])
+        return result
 
     def drop(self):
         if self.__dbName == None:
@@ -162,5 +169,16 @@ class database:
             return
         self.__dbName = None
         self.__root = None
-        # TODO:delete all files
+        fail_list = list()
+        for node in self.get_allNode():
+            r = self.delete(node)
+            if r != None:
+                fail_list.append(r)
+        if len(fail_list) == 0:
+            try:
+                os.rmdir(self.__dirname)
+            except:
+                print("Error failed to remove folder ", self.__dirname)
+        else:
+            print("Error failed to remove folder ", self.__dirname)
         pass
