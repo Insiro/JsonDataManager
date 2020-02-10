@@ -1,11 +1,13 @@
 from typing import Any, Union
 import datetime
+import os
+import json
 
 
 class DataNode:
     __fileName: str
     __dirName: str
-    __data: Union[dict, None]
+    __data: dict
     parent: Any
     left: Any
     right: Any
@@ -18,21 +20,29 @@ class DataNode:
         self.left = None
         self.right = None
 
-    def update(self, data: dict):
-        __data = data
-
-    def getData(self):
-        if self.__data == None:
-            with open("/" + self.__dirName + self.__fileName) as jsonfile:
-                self.__data = json.load(jsonfile)
-        return __data
-
     def __str__(self):
-        return self.__fileName
+        return self.__str__()
 
-    def commit(self):
-        self.__data["time"] = str(datetime.datetime.now())
-        with open(
-            "./" + str(self.__dirName) + "/" + str(self.__fileName) + ".json", "w"
-        ) as jsonfile:
-            json.dump(self.__data, jsonfile, indent="\t")
+    def set_data(self, data: dict):
+        self.__data = data
+
+    def get_data(self) -> dict:
+        return self.__data
+
+    def commit(self) -> bool:
+        self.data["time"] = str(datetime.datetime.now())
+        file: str = os.path.join(self.__dirName, self.__fileName + ".json")
+        try:
+            with open(file, "w") as jsonfile:
+                json.dump(self.__data, jsonfile, indent="\t")
+        except:
+            return False
+        return True
+
+    def load(self) -> bool:
+        file: str = os.path.join(self.__dirName, self.__fileName)
+        if os.path.isfile(file):
+            with open(file) as jsonfile:
+                self.data = json.load(jsonfile)
+            return True
+        return False
