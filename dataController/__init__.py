@@ -46,7 +46,33 @@ class database:
                     self.insert(data, file[:-5])
 
     def __rotate(self, direction: __direction, rotateRoot: DataNode):
-        pass
+        parent = rotateRoot.parent
+        if direction == __direction.LEFT:
+            right = rotateRoot.right
+            if right == None:
+                print("error")
+                return
+            rotateRoot.right = right.left
+            right.left = rotateRoot
+            if rotateRoot == self.__root:
+                self.__root == right
+            elif parent.left == rotateRoot:
+                parent.left = right
+            else:
+                parent.right = right
+        else:
+            left = rotateRoot.left
+            if left == None:
+                print("error")
+                return
+            rotateRoot.left = left.right
+            left.right = rotateRoot
+            if rotateRoot == self.__root:
+                self.__root == left
+            elif parent.left == rotateRoot:
+                parent.left = left
+            else:
+                parent.right = left
 
     def __rebalance(self):
         # TODO:rebalce
@@ -115,6 +141,18 @@ class database:
         return self.__root
 
     def get_node(self, dataID: str) -> Union[DataNode, None]:
+        if self.__root == None:
+            return None
+        node: DataNode = self.__root
+        while True:
+            if node == None:
+                return None
+            elif node.__str__() == dataID:
+                return node
+            elif node.__str__() > dataID:
+                node = node.left
+            else:
+                node = node.right
         return None
 
 
