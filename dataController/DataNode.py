@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Union, List
 import datetime
 import os
 import json
@@ -11,6 +11,7 @@ class DataNode:
     parent: Any
     left: Any
     right: Any
+    __node_count: List[int] = [0, 0]
 
     def __init__(self, data: dict, dataID: str, dirName: str):
         self.__data = data
@@ -46,3 +47,18 @@ class DataNode:
                 self.data = json.load(jsonfile)
             return True
         return False
+
+    def get_nodeCount(self) -> List[int]:
+        return self.__node_count
+
+    def update_nodeCount(self):
+        if self.left != None:
+            counts = self.left.get_nodeCount()
+            self.__node_count[0] = counts[0] + counts[1] + 1
+        else:
+            self.__node_count[0] = 0
+        if self.right != None:
+            counts = self.right.get_nodeCount()
+            self.__node_count[1] = counts[0] + counts[1] + 1
+        else:
+            self.__node_count[1] = 0

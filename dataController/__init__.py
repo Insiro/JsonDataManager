@@ -45,13 +45,12 @@ class database:
                     data = json.load(jsonfile)
                     self.insert(data, file[:-5])
 
-    def __rotate(self, direction: __direction, rotateRoot: DataNode):
+    def __rotate(self, direction: __direction, rotateRoot: DataNode) -> bool:
         parent = rotateRoot.parent
         if direction == __direction.LEFT:
             right = rotateRoot.right
             if right == None:
-                print("error")
-                return
+                return False
             rotateRoot.right = right.left
             right.left = rotateRoot
             if rotateRoot == self.__root:
@@ -60,11 +59,12 @@ class database:
                 parent.left = right
             else:
                 parent.right = right
+            rotateRoot.update_nodeCount()
+            right.update_nodeCount()
         else:
             left = rotateRoot.left
             if left == None:
-                print("error")
-                return
+                return False
             rotateRoot.left = left.right
             left.right = rotateRoot
             if rotateRoot == self.__root:
@@ -73,19 +73,22 @@ class database:
                 parent.left = left
             else:
                 parent.right = left
+            rotateRoot.update_nodeCount()
+            left.update_nodeCount()
+        return True
 
     def __rebalance(self):
         # TODO:rebalce
         pass
 
-    def insert(self, data: dict, dataID: str) -> DataNode:
+    def insert(self, data: dict, dataID: str) -> Union[DataNode,None]:
         if self.__dbName == None:
             print("Error : NULL DB")
-            return "Error : NULL DB"
+            return None
         node = DataNode(data, dataID, self.__dirname)
         if self.__root == None:
             self.__root = node
-            return
+            return node
         instance = self.__root
         while True:
             if instance.__str__() == dataID and instance.__str__() != None:
@@ -105,6 +108,10 @@ class database:
                     break
                 else:
                     instance = instance.right
+        instance = node.parent
+        while instance != None:
+            instance.update_nodeCount()
+            instance = instance.parent
         self.__rebalance()
         return node
 
