@@ -130,12 +130,12 @@ class database:
         self.__rebalance(node.parent.parent)
         return node
 
-    def delete(self, data: Union(str, DataNode, None)) -> Union[str, None]:
+    def delete(self, data: Union(str, DataNode, None)) -> str:
         if self.__dbName == None:
             print("Error : NULL DB")
-            return "Null DB error"
+            return "Error : Null DB"
         elif data == None:
-            return "Null Data Error"
+            return "Error : Null Data"
         dataID: str = str(data)
         try:
             os.remove("/" + self.__dirname + "/" + dataID + ".json")
@@ -157,7 +157,7 @@ class database:
             parent.right = None
         del data
         self.__rebalance(parent.parent)
-        return None
+        return "success"
 
     def get_root(self) -> Union[DataNode, None]:
         return self.__root
