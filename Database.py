@@ -1,11 +1,11 @@
 import os
 import json
-from typing import Any, Union, List
-from .DataNode import DataNode
 from enum import Enum
+from typing import Any, Union, List
+from DataNode import DataNode
 
 
-class __direction(Enum):
+class direction(Enum):
     LEFT = True
     RIGHT = False
 
@@ -45,9 +45,9 @@ class database:
                     data = json.load(jsonfile)
                     self.insert(data, file[:-5])
 
-    def __rotate(self, direction: __direction, rotateRoot: DataNode) -> bool:
+    def __rotate(self, direction: direction, rotateRoot: DataNode) -> bool:
         parent = rotateRoot.parent
-        if direction == __direction.LEFT:
+        if direction == direction.LEFT:
             right = rotateRoot.right
             if right == None:
                 return False
@@ -87,13 +87,13 @@ class database:
             if balance > 1:
                 nodes = node.left.get_nodeCount()
                 if nodes[0] - nodes[1] < 0:
-                    self.__rotate(__direction.LEFT, node.left)
-                self.__rotate(__direction.RIGHT, node)
+                    self.__rotate(direction.LEFT, node.left)
+                self.__rotate(direction.RIGHT, node)
             elif balance < -1:
                 nodes = node.left.get_nodeCount()
                 if nodes[0] - nodes[1] > 0:
-                    self.__rotate(__direction.RIGHT, node.left)
-                self.__rotate(__direction, node.right)
+                    self.__rotate(direction.RIGHT, node.left)
+                self.__rotate(direction.LEFT, node.right)
             node = node.parent
 
     def insert(self, data: dict, dataID: str) -> Union[DataNode, None]:
@@ -108,7 +108,7 @@ class database:
         while True:
             if instance.__str__() == dataID and instance.__str__() != None:
                 print("exests Node")
-                return "exests Node"
+                return None
             elif instance.__str__() > dataID:
                 if instance.left == None:
                     instance.left = node
@@ -130,7 +130,7 @@ class database:
         self.__rebalance(node.parent.parent)
         return node
 
-    def delete(self, data: Union(str, DataNode, None)) -> str:
+    def delete(self, data: Union[str, DataNode, None]) -> str:
         if self.__dbName == None:
             print("Error : NULL DB")
             return "Error : Null DB"
@@ -145,9 +145,9 @@ class database:
             data = self.get_node(dataID)
         while data.left != None and data.right != None:
             if data.left != None:
-                self.__rotate(__direction.RIGHT, data)
+                self.__rotate(direction.RIGHT, data)
             elif data.right != None:
-                self.__rotate(__direction.LEFT, data)
+                self.__rotate(direction.LEFT, data)
         parent = data.parent
         if self.__root == data:
             self.__root = None
@@ -180,7 +180,7 @@ class database:
     # use dfs Search
     def get_allNode(self) -> List[DataNode]:
         stack = []
-        result = list()
+        result: List[DataNode] = list()
         instance: DataNode = self.__root
         stack.append([instance, None])
         return result
