@@ -65,7 +65,8 @@ class DB_Loader:
             print("Null DB")
             return
         while True:
-            exe = input(db, "> ").split(" ")
+            line = input("db "+db.__str__() + "> ")
+            exe = line.split(" ")
             if exe[0] == "insert":
                 while True:
                     print("dataID : ", exe[1], "input 0 for cancel")
@@ -80,7 +81,12 @@ class DB_Loader:
                 result = db.delete(exe[1])
                 print(result)
             elif exe[0] == "get_node":
-                self.__nodeExcute(db.get_node())
+                dataID: str
+                if len(exe) == 1:
+                    dataID = input("input Data ID : ")
+                else:
+                    dataID = exe[1]
+                self.__nodeExcute(db.get_node(dataID))
             elif exe[0] == "drop_db":
                 db.drop()
             elif exe[0] == "exit":
@@ -95,7 +101,7 @@ class DB_Loader:
             print("Null node")
             return
         while True:
-            exe = input(node, "> ").split(" ")
+            exe = input("node "+node.__str__() + "> ").split(" ")
             if exe[0] == "exit":
                 return
             elif exe[0] == "set_data":
@@ -120,7 +126,7 @@ class DB_Loader:
 
     def cui(self):
         while True:
-            cmi = input()
+            cmi = input(">")
             args = cmi.split(" ")
             if args[0] == "command":
                 print("exit, list, load, create, use, release")
