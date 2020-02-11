@@ -77,11 +77,26 @@ class database:
             left.update_nodeCount()
         return True
 
-    def __rebalance(self):
-        # TODO:rebalce
-        pass
+    def __rebalance(self, grandParentNode: DataNode):
+        node = grandParentNode
+        nodes: List[int]
+        balance: int
+        while node != None:
+            nodes = node.get_nodeCount()
+            balance = nodes[0] - nodes[1]
+            if balance > 1:
+                nodes = node.left.get_nodeCount()
+                if nodes[0] - nodes[1] < 0:
+                    self.__rotate(__direction.LEFT, node.left)
+                self.__rotate(__direction.RIGHT, node)
+            elif balance < -1:
+                nodes = node.left.get_nodeCount()
+                if nodes[0] - nodes[1] > 0:
+                    self.__rotate(__direction.RIGHT, node.left)
+                self.__rotate(__direction, node.right)
+            node = node.parent
 
-    def insert(self, data: dict, dataID: str) -> Union[DataNode,None]:
+    def insert(self, data: dict, dataID: str) -> Union[DataNode, None]:
         if self.__dbName == None:
             print("Error : NULL DB")
             return None
@@ -112,20 +127,20 @@ class database:
         while instance != None:
             instance.update_nodeCount()
             instance = instance.parent
-        self.__rebalance()
+        self.__rebalance(node.parent.parent)
         return node
 
     def delete(self, data: Union(str, DataNode, None)) -> Union[str, None]:
         if self.__dbName == None:
             print("Error : NULL DB")
-            return
+            return "Null DB error"
         elif data == None:
-            return
+            return "Null Data Error"
         dataID: str = str(data)
         try:
             os.remove("/" + self.__dirname + "/" + dataID + ".json")
         except OSError:
-            return dataID
+            return "Error : remove File : " + dataID
         if not isinstance(data, DataNode):
             data = self.get_node(dataID)
         while data.left != None and data.right != None:
@@ -141,7 +156,7 @@ class database:
         else:
             parent.right = None
         del data
-        self.__rebalance()
+        self.__rebalance(parent.parent)
         return None
 
     def get_root(self) -> Union[DataNode, None]:
@@ -184,8 +199,7 @@ class database:
         if len(fail_list) == 0:
             try:
                 os.rmdir(self.__dirname)
+                return
             except:
                 print("Error failed to remove folder ", self.__dirname)
-        else:
-            print("Error failed to remove folder ", self.__dirname)
-        pass
+        print("Error failed to remove folder ", self.__dirname)
