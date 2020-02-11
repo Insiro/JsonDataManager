@@ -22,7 +22,7 @@ class DataNode:
         self.right = None
 
     def __str__(self):
-        return self.__str__()
+        return self.__fileName
 
     def set_data(self, data: dict):
         self.__data = data

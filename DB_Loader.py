@@ -25,23 +25,23 @@ class DB_Loader:
         return r
 
     def load_db(self, dbName: str):
-        print(dbName)
         if dbName == "":
+            print("fail")
             return
         dbPath: str = os.path.join(self.__newDataRoot, dbName)
-        print(dbPath)
         if os.path.isdir(dbPath):
-            self.__dbList.append(database(dbName, dbPath, False))
-            print("success")
+            self.__dbList.append(
+                database(baseRoot=self.__newDataRoot, dbName=dbName, generate=False)
+            )
             return
         for path in self.__DataRoot:
             dbPath = os.path.join(path, dbName)
-            print(dbPath)
             if os.path.isdir(dbPath):
-                self.__dbList.append(database(dbName, dbPath, False))
-                print("success")
+                self.__dbList.append(
+                    database(baseRoot=path, dbName=dbName, generate=False)
+                )
                 return
-        print("fail")
+        print("Error : Not Exists DB")
 
     def reloase_DB(self, dbName: str):
         for db in self.__dbList:
@@ -85,8 +85,10 @@ class DB_Loader:
                 db.drop()
             elif exe[0] == "exit":
                 return
+            elif exe[0] == "command":
+                print("insert, delete, get_node, exit")
             else:
-                "wrong instruct"
+                print("wrong command, for sea list type command")
 
     def __nodeExcute(self, node):
         if node == None:
@@ -111,14 +113,18 @@ class DB_Loader:
                 print(node.get_data())
             elif exe[0] == "load":
                 print("success" if node.load() else "fail")
+            elif exe[0] == "command":
+                print("set_data, commit, get_data, load")
             else:
-                print("wrong instruct")
+                print("wrong command, for sea list type command")
 
     def cui(self):
         while True:
             cmi = input()
             args = cmi.split(" ")
-            if args[0] == "exit":
+            if args[0] == "command":
+                print("exit, list, load, create, use, release")
+            elif args[0] == "exit":
                 exit()
             elif args[0] == "list":
                 print(self.get_dbList())
@@ -136,7 +142,7 @@ class DB_Loader:
             elif args[0] == "release":
                 self.reloase_DB(args[1])
             else:
-                print("Wrong args")
+                print("wrong command, for sea list type command")
 
 
 if __name__ == "__main__":

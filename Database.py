@@ -41,7 +41,7 @@ class database:
         filelist = os.listdir(self.__dirname)
         for file in filelist:
             if file[-5:] == ".json":
-                with open(self.__dirname + "/" + file, "r") as jsonfile:
+                with open(os.path.join(self.__dirname, file), "r") as jsonfile:
                     data = json.load(jsonfile)
                     self.insert(data, file[:-5])
 
