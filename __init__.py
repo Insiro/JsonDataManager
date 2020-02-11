@@ -1,2 +1,2 @@
-__all__ = ["Database", "DataNode", "DB_Loader"]
+__all__ = ["Collection", "DataNode", "Loader"]
 

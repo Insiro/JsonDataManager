@@ -10,32 +10,32 @@ class direction(Enum):
     RIGHT = False
 
 
-class database:
+class Collection:
     __dirname: str = ""
-    __dbName: Union[str, None] = None
+    __collectionName: Union[str, None] = None
     __root: Any = None
 
-    def __init__(self, dbName, baseRoot: str, generate=False):
-        dirname = os.path.join(baseRoot, dbName)
+    def __init__(self, collectionName, baseRoot: str, generate=False):
+        dirname = os.path.join(baseRoot, collectionName)
         self.__dirname = dirname
         if generate:
             try:
                 if not os.path.exists(dirname):
                     os.makedirs(dirname)
-                    self.__dbName = dbName
+                    self.__collectionName = collectionName
                 else:
-                    print("Error : Already Exists DB")
+                    print("Error : Already Exists collection")
             except OSError:
-                print("Error : Creating DB. " + dbName)
+                print("Error : Creating collection. " + collectionName)
         else:
             if os.path.exists(dirname):
-                self.__dbName = dbName
+                self.__collectionName = collectionName
                 self.__load()
             else:
-                print("Error : Not Exists DB")
+                print("Error : Not Exists collection")
 
     def __str__(self):
-        return self.__dbName
+        return self.__collectionName
 
     def __load(self):
         filelist = os.listdir(self.__dirname)
@@ -59,8 +59,8 @@ class database:
                 parent.left = right
             else:
                 parent.right = right
-            rotateRoot.update_nodeCount()
-            right.update_nodeCount()
+            rotateRoot.updateNodeCount()
+            right.updateNodeCount()
         else:
             left = rotateRoot.left
             if left == None:
@@ -73,8 +73,8 @@ class database:
                 parent.left = left
             else:
                 parent.right = left
-            rotateRoot.update_nodeCount()
-            left.update_nodeCount()
+            rotateRoot.updateNodeCount()
+            left.updateNodeCount()
         return True
 
     def __rebalance(self, grandParentNode: DataNode):
@@ -82,23 +82,23 @@ class database:
         nodes: List[int]
         balance: int
         while node != None:
-            nodes = node.get_nodeCount()
+            nodes = node.getNodeCount()
             balance = nodes[0] - nodes[1]
             if balance > 1:
-                nodes = node.left.get_nodeCount()
+                nodes = node.left.getNodeCount()
                 if nodes[0] - nodes[1] < 0:
                     self.__rotate(direction.LEFT, node.left)
                 self.__rotate(direction.RIGHT, node)
             elif balance < -1:
-                nodes = node.left.get_nodeCount()
+                nodes = node.left.getNodeCount()
                 if nodes[0] - nodes[1] > 0:
                     self.__rotate(direction.RIGHT, node.left)
                 self.__rotate(direction.LEFT, node.right)
             node = node.parent
 
     def insert(self, data: dict, dataID: str) -> Union[DataNode, None]:
-        if self.__dbName == None:
-            print("Error : NULL DB")
+        if self.__collectionName == None:
+            print("Error : NULL collection")
             return None
         node = DataNode(data, dataID, self.__dirname)
         if self.__root == None:
@@ -125,15 +125,15 @@ class database:
                     instance = instance.right
         instance = node.parent
         while instance != None:
-            instance.update_nodeCount()
+            instance.updateNodeCount()
             instance = instance.parent
         self.__rebalance(node.parent.parent)
         return node
 
     def delete(self, data: Union[str, DataNode, None]) -> str:
-        if self.__dbName == None:
-            print("Error : NULL DB")
-            return "Error : Null DB"
+        if self.__collectionName == None:
+            print("Error : NULL collection")
+            return "Error : Null collection"
         elif data == None:
             return "Error : Null Data"
         dataID: str = str(data)
@@ -142,7 +142,7 @@ class database:
         except OSError:
             return "Error : remove File : " + dataID
         if not isinstance(data, DataNode):
-            data = self.get_node(dataID)
+            data = self.getNode(dataID)
         while data.left != None and data.right != None:
             if data.left != None:
                 self.__rotate(direction.RIGHT, data)
@@ -159,10 +159,10 @@ class database:
         self.__rebalance(parent.parent)
         return "success"
 
-    def get_root(self) -> Union[DataNode, None]:
+    def getRoot(self) -> Union[DataNode, None]:
         return self.__root
 
-    def get_node(self, dataID: str) -> Union[DataNode, None]:
+    def getNode(self, dataID: str) -> Union[DataNode, None]:
         if self.__root == None:
             return None
         node: DataNode = self.__root
@@ -178,7 +178,7 @@ class database:
         return None
 
     # use dfs Search
-    def get_allNode(self) -> List[DataNode]:
+    def getAllNode(self) -> List[DataNode]:
         stack = []
         result: List[DataNode] = list()
         instance: DataNode = self.__root
@@ -186,13 +186,13 @@ class database:
         return result
 
     def drop(self):
-        if self.__dbName == None:
-            print("Error : NULL DB")
+        if self.__collectionName == None:
+            print("Error : NULL collection")
             return
-        self.__dbName = None
+        self.__collectionName = None
         self.__root = None
         fail_list = list()
-        for node in self.get_allNode():
+        for node in self.getAllNode():
             r = self.delete(node)
             if r != None:
                 fail_list.append(r)

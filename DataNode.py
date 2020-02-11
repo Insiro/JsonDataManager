@@ -24,10 +24,10 @@ class DataNode:
     def __str__(self):
         return self.__fileName
 
-    def set_data(self, data: dict):
+    def setData(self, data: dict):
         self.__data = data
 
-    def get_data(self) -> dict:
+    def getData(self) -> dict:
         return self.__data
 
     def commit(self) -> bool:
@@ -48,17 +48,17 @@ class DataNode:
             return True
         return False
 
-    def get_nodeCount(self) -> List[int]:
+    def getNodeCount(self) -> List[int]:
         return self.__node_count
 
-    def update_nodeCount(self):
+    def updateNodeCount(self):
         if self.left != None:
-            counts = self.left.get_nodeCount()
+            counts = self.left.getNodeCount()
             self.__node_count[0] = counts[0] + counts[1] + 1
         else:
             self.__node_count[0] = 0
         if self.right != None:
-            counts = self.right.get_nodeCount()
+            counts = self.right.getNodeCount()
             self.__node_count[1] = counts[0] + counts[1] + 1
         else:
             self.__node_count[1] = 0
