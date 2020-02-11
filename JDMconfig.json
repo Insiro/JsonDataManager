@@ -1,3 +1,5 @@
 {
-    "dataRoot":["/data"]
+    "newDataRoot": "data",
+    "dataRoot": ["data"],
+    "Port": 5517
 }
