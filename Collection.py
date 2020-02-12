@@ -177,11 +177,49 @@ class Collection:
         return None
 
     # use dfs Search
+
+    def getNodeNames(self) -> List[str]:
+        stack: List[DataNode] = [self.__root]
+        names: List[str] = []
+        node = self.__root
+        isPop = False
+        while len(stack) != 0 or isPop == False:
+            if isPop:
+                node = stack.pop()
+                if node != self.__root or node.__str__() not in names:
+                    names.append(node.__str__())
+                if node.right != None:
+                    isPop = False
+                    node = node.right
+            else:
+                if node.left != None:
+                    stack.append(node)
+                    node = node.left
+                else:
+                    isPop = True
+                    names.append(node.__str__())
+        return names
+
     def getAllNode(self) -> List[DataNode]:
-        stack = []
-        result: List[DataNode] = list()
-        instance: DataNode = self.__root
-        stack.append([instance, None])
+        stack: List[DataNode] = [self.__root]
+        result: List[DataNode] = []
+        node = self.__root
+        isPop = False
+        while len(stack) != 0 or isPop == False:
+            if isPop:
+                node = stack.pop()
+                if node != self.__root or node not in result:
+                    result.append(node)
+                if node.right != None:
+                    isPop = False
+                    node = node.right
+            else:
+                if node.left != None:
+                    stack.append(node)
+                    node = node.left
+                else:
+                    isPop = True
+                    result.append(node)
         return result
 
     def drop(self):
