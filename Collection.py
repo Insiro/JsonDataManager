@@ -188,17 +188,10 @@ class Collection:
         if self.__collectionName == None:
             print("Error : NULL collection")
             return
-        self.__collectionName = None
-        self.__root = None
-        fail_list = list()
-        for node in self.getAllNode():
-            r = self.delete(node)
-            if r != None:
-                fail_list.append(r)
-        if len(fail_list) == 0:
-            try:
-                os.rmdir(self.__dirname)
-                return
-            except:
-                print("Error failed to remove folder ", self.__dirname)
-        print("Error failed to remove folder ", self.__dirname)
+        try:
+            for filename in os.listdir(self.__dirname):
+                os.remove(os.path.join(self.__dirname, filename + ".json"))
+            os.rmdir(self.__dirname)
+        except OSError:
+            print("Error failed to remove folder ", self.__dirname)
+            return
