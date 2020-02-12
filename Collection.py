@@ -45,7 +45,7 @@ class Collection:
                     data = json.load(jsonfile)
                     self.insert(data, file[:-5])
 
-    def __rotate(self, direction: direction, rotateRoot: DataNode) -> bool:
+    def __rotate(self, direction: direction, rotateRoot: DataNode):
         parent = rotateRoot.parent
         if direction == direction.LEFT:
             right = rotateRoot.right
@@ -59,8 +59,8 @@ class Collection:
                 parent.left = right
             else:
                 parent.right = right
-            rotateRoot.updateNodeCount()
-            right.updateNodeCount()
+            rotateRoot.updateHeight()
+            right.updateHeight()
         else:
             left = rotateRoot.left
             if left == None:
@@ -73,8 +73,8 @@ class Collection:
                 parent.left = left
             else:
                 parent.right = left
-            rotateRoot.updateNodeCount()
-            left.updateNodeCount()
+            rotateRoot.updateHeight()
+            left.updateHeight()
         return True
 
     def __rebalance(self, root: DataNode):
@@ -125,11 +125,8 @@ class Collection:
                     break
                 else:
                     instance = instance.right
-        instance = node.parent
-        while instance != None:
-            instance.updateNodeCount()
-            instance = instance.parent
-        self.__rebalance(node.parent.parent)
+        self.updateHeight(node)
+        self.__rebalance(instance.parent)
         return node
 
     def delete(self, data: Union[str, DataNode, None]) -> str:
