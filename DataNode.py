@@ -11,12 +11,15 @@ class DataNode:
     parent: Any
     left: Any
     right: Any
-    __node_count: List[int] = [0, 0]
+    __height: int
+    __balance: int
 
     def __init__(self, data: dict, dataID: str, dirName: str):
         self.__data = data
         self.__dirName = dirName
         self.__fileName = dataID
+        self.__height = 1
+        self.__balance = 0
         self.parent = None
         self.left = None
         self.right = None
@@ -48,17 +51,15 @@ class DataNode:
             return True
         return False
 
-    def getNodeCount(self) -> List[int]:
-        return self.__node_count
+    def getHeight(self):
+        return self.__height
 
-    def updateNodeCount(self):
-        if self.left != None:
-            counts = self.left.getNodeCount()
-            self.__node_count[0] = counts[0] + counts[1] + 1
-        else:
-            self.__node_count[0] = 0
-        if self.right != None:
-            counts = self.right.getNodeCount()
-            self.__node_count[1] = counts[0] + counts[1] + 1
-        else:
-            self.__node_count[1] = 0
+    def getBalance(self):
+        return self.__balance
+
+    def updateHeight(self):
+        lh = self.left.getHeight() if self.left != None else 0
+        rh = self.right.getHeight() if self.right != None else 0
+        self.__height = max(lh, rh) + 1
+        self.__balance = lh - rh
+
