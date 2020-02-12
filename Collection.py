@@ -77,23 +77,25 @@ class Collection:
             left.updateNodeCount()
         return True
 
-    def __rebalance(self, grandParentNode: DataNode):
-        node = grandParentNode
-        nodes: List[int]
-        balance: int
-        while node != None:
-            nodes = node.getNodeCount()
-            balance = nodes[0] - nodes[1]
+    def __rebalance(self, root: DataNode):
+        while root != None:
+            balance = root.getBalance()
             if balance > 1:
-                nodes = node.left.getNodeCount()
-                if nodes[0] - nodes[1] < 0:
-                    self.__rotate(direction.LEFT, node.left)
-                self.__rotate(direction.RIGHT, node)
+                sub = root.left
+                if balance < sub.getBalance():
+                    self.__rotate(direction.LEFT, sub)
+                self.__rotate(direction.RIGHT, root)
             elif balance < -1:
-                nodes = node.left.getNodeCount()
-                if nodes[0] - nodes[1] > 0:
-                    self.__rotate(direction.RIGHT, node.left)
-                self.__rotate(direction.LEFT, node.right)
+                sub = root.right
+                if balance > sub.getBalance():
+                    self.__rotate(direction.RIGHT, sub)
+                self.__rotate(direction.LEFT, root)
+            self.updateHeight(sub)
+            root = root.parent
+
+    def updateHeight(self, node: DataNode):
+        while node != None:
+            node.updateHeight()
             node = node.parent
 
     def insert(self, data: dict, dataID: str) -> Union[DataNode, None]:
