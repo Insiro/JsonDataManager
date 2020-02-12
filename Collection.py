@@ -178,7 +178,7 @@ class Collection:
 
     # use dfs Search
 
-    def getNodeNames(self) -> List[str]:
+    def getNames(self) -> List[str]:
         stack: List[DataNode] = [self.__root]
         names: List[str] = []
         node = self.__root
@@ -200,7 +200,7 @@ class Collection:
                     names.append(node.__str__())
         return names
 
-    def getAllNode(self) -> List[DataNode]:
+    def getAll(self) -> List[DataNode]:
         stack: List[DataNode] = [self.__root]
         result: List[DataNode] = []
         node = self.__root
