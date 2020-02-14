@@ -5,11 +5,6 @@ from typing import Any, Union, List
 from DataNode import DataNode
 
 
-class direction(Enum):
-    LEFT = True
-    RIGHT = False
-
-
 class Collection:
     __dirname: str = ""
     __collectionName: Union[str, None] = None
@@ -45,20 +40,22 @@ class Collection:
                     data = json.load(jsonfile)
                     self.insert(data, file[:-5])
 
-    def __rotate(self, direction: direction, rotateRoot: DataNode):
+    def __rotate(self, direction: str, rotateRoot: DataNode):
         parent = rotateRoot.parent
-        if direction == direction.LEFT:
+        if direction.lower() == "left":
             newRoot = rotateRoot.right
             if newRoot == None:
                 return False
             rotateRoot.right = newRoot.left
             newRoot.left = rotateRoot
-        else:
+        elif direction.lower() == "right":
             newRoot = rotateRoot.left
             if newRoot == None:
                 return False
             rotateRoot.left = newRoot.right
             newRoot.right = rotateRoot
+        else:
+            return
         rotateRoot.parent = newRoot
         if rotateRoot.left != None:
             rotateRoot.left.parent = rotateRoot
@@ -80,13 +77,13 @@ class Collection:
             if balance > 1:
                 sub = root.left
                 if sub.getBalance() < 0:
-                    self.__rotate(direction.LEFT, sub)
-                self.__rotate(direction.RIGHT, root)
+                    self.__rotate("LEFT", sub)
+                self.__rotate("RIGHT", root)
             elif balance < -1:
                 sub = root.right
                 if sub.getBalance() > 0:
-                    self.__rotate(direction.RIGHT, sub)
-                self.__rotate(direction.LEFT, root)
+                    self.__rotate("RIGHT", sub)
+                self.__rotate("LEFT", root)
             self.updateHeight(sub)
             root = root.parent
 
@@ -142,9 +139,9 @@ class Collection:
             data = self.getNode(dataID)
         while data.left != None and data.right != None:
             if data.left != None:
-                self.__rotate(direction.RIGHT, data)
+                self.__rotate("RIGHT", data)
             elif data.right != None:
-                self.__rotate(direction.LEFT, data)
+                self.__rotate("LEFT", data)
         parent = data.parent
         if self.__root == data:
             self.__root = None
