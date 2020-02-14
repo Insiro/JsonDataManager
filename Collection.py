@@ -176,47 +176,42 @@ class Collection:
     # use dfs Search
 
     def getNames(self) -> List[str]:
-        stack: List[DataNode] = [self.__root]
+        stack: List[DataNode] = []
         names: List[str] = []
         node = self.__root
         isPop = False
-        while len(stack) != 0 or isPop == False:
+        while not isPop or len(stack) != 0:
             if isPop:
                 node = stack.pop()
-                if node != self.__root or node.__str__() not in names:
-                    names.append(node.__str__())
-                if node.right != None:
-                    isPop = False
+                names.append(node.__str__())
+                if node.right != None and node.right.__str__() not in names:
                     node = node.right
+                    isPop = False
             else:
-                if node.left != None:
-                    stack.append(node)
-                    node = node.left
-                else:
+                stack.append(node)
+                if node.left == None:
                     isPop = True
-                    names.append(node.__str__())
+                else:
+                    node = node.left
         return names
 
     def getAll(self) -> List[DataNode]:
-        stack: List[DataNode] = [self.__root]
+        stack: List[DataNode] = []
         result: List[DataNode] = []
         node = self.__root
         isPop = False
-        while len(stack) != 0 or isPop == False:
+        while not isPop or len(stack) != 0:
             if isPop:
                 node = stack.pop()
-                if node != self.__root or node not in result:
-                    result.append(node)
-                if node.right != None:
-                    isPop = False
+                result.append(node)
+                if node.right != None and node.right not in result:
                     node = node.right
+                    isPop = False
             else:
+                stack.append(node)
                 if node.left != None:
-                    stack.append(node)
-                    node = node.left
-                else:
                     isPop = True
-                    result.append(node)
+                node = node.left
         return result
 
     def drop(self):
