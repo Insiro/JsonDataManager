@@ -48,31 +48,34 @@ class Collection:
                 return False
             rotateRoot.right = newRoot.left
             newRoot.left = rotateRoot
+            if rotateRoot.right != None:
+                rotateRoot.right.parent = rotateRoot
         elif direction.lower() == "right":
             newRoot = rotateRoot.left
             if newRoot == None:
                 return False
             rotateRoot.left = newRoot.right
             newRoot.right = rotateRoot
+            if rotateRoot.left != None:
+                rotateRoot.left.parent = rotateRoot
         else:
             return
         rotateRoot.parent = newRoot
-        if rotateRoot.left != None:
-            rotateRoot.left.parent = rotateRoot
         if rotateRoot == self.__root:
-            self.__root == newRoot
-            newRoot.parent = None
+            self.__root = newRoot
+            # newRoot.parent = None
         elif parent.left == rotateRoot:
             parent.left = newRoot
         elif parent.right == rotateRoot:
             parent.right = newRoot
-        rotateRoot.updateHeight()
-        newRoot.updateHeight()
+        newRoot.parent = parent
+        self.updateHeight(rotateRoot)
         return True
 
     def __rebalance(self, root: DataNode):
         while root != None:
             balance = root.getBalance()
+            p = root.parent
             sub = None
             if balance > 1:
                 sub = root.left
@@ -85,7 +88,7 @@ class Collection:
                     self.__rotate("RIGHT", sub)
                 self.__rotate("LEFT", root)
             self.updateHeight(sub)
-            root = root.parent
+            root = p
 
     def updateHeight(self, node: DataNode):
         while node != None:
@@ -93,7 +96,6 @@ class Collection:
             node = node.parent
 
     def insert(self, data: dict, dataID: str) -> Union[DataNode, None]:
-        print(dataID)
         if self.__collectionName == None:
             print("Error : NULL collection")
             return None
