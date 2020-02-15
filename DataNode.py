@@ -31,7 +31,7 @@ class DataNode:
         self.__data = data
 
     def getData(self) -> dict:
-        return self.__data
+        return json.dumps(self.__data, indent="\t", ensure_ascii=False)
 
     def updateData(self, data: dict):
         self.__data.update(data)
@@ -50,7 +50,7 @@ class DataNode:
         file: str = os.path.join(self.__dirName, self.__fileName + ".json")
         try:
             with open(file, "w", encoding="UTF8") as jsonfile:
-                json.dump(self.__data, jsonfile, indent="\t")
+                json.dump(self.__data, jsonfile, indent="\t", ensure_ascii=False)
         except:
             return False
         return True
