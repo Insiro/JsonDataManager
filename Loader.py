@@ -45,9 +45,7 @@ class Loader:
                     if os.path.isdir(collectionPath):
                         self.__collections.append(
                             Collection(
-                                baseRoot=self.__newDataRoot,
-                                collectionName=collectionName,
-                                generate=False,
+                                baseRoot=path, collectionName=item, generate=False,
                             )
                         )
             return
