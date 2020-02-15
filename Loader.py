@@ -28,6 +28,29 @@ class Loader:
         if collectionName == "":
             print("fail")
             return
+        elif collectionName == "*":
+            for item in os.listdir(self.__newDataRoot):
+                dirname = os.path.join(self.__newDataRoot, item)
+                if os.path.isdir(dirname):
+                    self.__collections.append(
+                        Collection(
+                            baseRoot=self.__newDataRoot,
+                            collectionName=item,
+                            generate=False,
+                        )
+                    )
+            for path in self.__dataRoot:
+                for item in os.listdir(path):
+                    collectionPath = os.path.join(path, item)
+                    if os.path.isdir(collectionPath):
+                        self.__collections.append(
+                            Collection(
+                                baseRoot=self.__newDataRoot,
+                                collectionName=collectionName,
+                                generate=False,
+                            )
+                        )
+            return
         collectionPath: str = os.path.join(self.__newDataRoot, collectionName)
         if os.path.isdir(collectionPath):
             self.__collections.append(
@@ -71,9 +94,9 @@ class Loader:
             print("Null collection")
             return
         while True:
-            line = input(collection.__str__() + "> ")
-            exe = line.split(" ")
-            if exe[0] == "insert":
+            exe = input(collection.__str__() + "> ").strip().split(" ")
+            command = exe[0].lower()
+            if command == "insert":
                 while True:
                     print("dataID : ", exe[1], "input 0 for cancel")
                     path = input("dataID : ", exe[1], ", input json path : ")
@@ -83,22 +106,24 @@ class Loader:
                         with open(path, "r") as jfile:
                             collection.insert(exe[1], jfile)
                             break
-            elif exe[0] == "delete":
+            elif command == "delete":
                 result = collection.delete(exe[1])
                 print(result)
-            elif exe[0] == "getNode":
+            elif command == "getnode":
                 dataID: str
                 if len(exe) == 1:
                     dataID = input("input Data ID : ")
                 else:
                     dataID = exe[1]
                 self.__nodeExcute(collection, collection.getNode(dataID))
-            elif exe[0] == "drop":
+            elif command == "drop":
                 collection.drop()
-            elif exe[0] == "exit":
+            elif command == "list":
+                print(collection.getNames())
+            elif command == "exit":
                 return
-            elif exe[0] == "command":
-                print("insert, delete, getNode, drop, exit")
+            elif command == "command":
+                print("insert, delete, getNode, drop, list, exit")
             else:
                 print("wrong command, for sea list type command")
 
@@ -107,10 +132,15 @@ class Loader:
             print("Null node")
             return
         while True:
-            exe = input(collection.__str__() + ">" + node.__str__() + "> ").split(" ")
-            if exe[0] == "exit":
+            exe = (
+                input(collection.__str__() + ">" + node.__str__() + "> ")
+                .strip()
+                .split(" ")
+            )
+            command = exe[0].lower()
+            if command == "exit":
                 return
-            elif exe[0] == "setData":
+            elif command == "setdata":
                 while True:
                     path = input("insert your json file Path or 0: ")
                     if path == 0:
@@ -119,39 +149,39 @@ class Loader:
                         with open(path, "r") as jfile:
                             node.setData(json.load(jfile))
                             break
-            elif exe[0] == "commit":
+            elif command == "commit":
                 node.commit()
-            elif exe[0] == "getData":
+            elif command == "getdata":
                 print(node.getData())
-            elif exe[0] == "load":
+            elif command == "load":
                 print("success" if node.load() else "fail")
-            elif exe[0] == "command":
+            elif command == "command":
                 print("setData, commit, getData, load")
             else:
                 print("wrong command, for sea list type command")
 
     def cui(self):
         while True:
-            cmi = input(">")
-            args = cmi.split(" ")
-            if args[0] == "command":
+            args = input(">").strip().split(" ")
+            command = args[0].lower()
+            if command == "command":
                 print("exit, list, load, create, use, release")
-            elif args[0] == "exit":
+            elif command == "exit":
                 exit()
-            elif args[0] == "list":
+            elif command == "list":
                 print(self.getCollectionList())
-            elif args[0] == "load":
+            elif command == "load":
                 if len(args) < 2:
                     collectionName = input("input collection Name")
                 else:
                     collectionName = args[1]
                 self.loadCollection(collectionName)
                 # load Collection
-            elif args[0] == "create":
+            elif command == "create":
                 self.createCollection(args[1])
-            elif args[0] == "use":
+            elif command == "use":
                 self.__CollectionExcute(self.getCollection(args[1]))
-            elif args[0] == "release":
+            elif command == "release":
                 self.releaseCollection(args[1])
             else:
                 print("wrong command, for sea list type command")
