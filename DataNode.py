@@ -40,7 +40,7 @@ class DataNode:
         self.data["time"] = str(datetime.datetime.now())
         file: str = os.path.join(self.__dirName, self.__fileName + ".json")
         try:
-            with open(file, "w") as jsonfile:
+            with open(file, "w", encoding="UTF8") as jsonfile:
                 json.dump(self.__data, jsonfile, indent="\t")
         except:
             return False

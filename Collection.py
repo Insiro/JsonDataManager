@@ -37,13 +37,17 @@ class Collection:
         filelist = os.listdir(self.__dirname)
         for file in filelist:
             if file[-5:] == ".json":
-                if file[:6] == ".schemna":
-                    with open(os.path.join(self.__dirname, file), "r") as jsonfile:
+                if file[:6] == ".schema":
+                    with open(
+                        os.path.join(self.__dirname, file), "r", encoding="UTF8"
+                    ) as jsonfile:
                         self.__schema = DataNode(
                             json.load(jsonfile), "schema", self.__dirname
                         )
                 else:
-                    with open(os.path.join(self.__dirname, file), "r") as jsonfile:
+                    with open(
+                        os.path.join(self.__dirname, file), "r", encoding="UTF8"
+                    ) as jsonfile:
                         data = json.load(jsonfile)
                         self.insert(data, file[:-5])
 
