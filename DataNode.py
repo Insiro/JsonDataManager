@@ -33,6 +33,9 @@ class DataNode:
     def getData(self) -> dict:
         return self.__data
 
+    def updateData(self, data: dict):
+        self.__data.update(data)
+
     def commit(self) -> bool:
         self.data["time"] = str(datetime.datetime.now())
         file: str = os.path.join(self.__dirName, self.__fileName + ".json")
@@ -42,6 +45,18 @@ class DataNode:
         except:
             return False
         return True
+
+    def getInfo(self) -> str:
+        return (
+            "nodeName : "
+            + self.__fileName
+            + "\nparent : "
+            + self.parent.__str__()
+            + "\nleft : "
+            + self.left.__str__()
+            + "\tright : "
+            + self.right.__str__()
+        )
 
     def load(self) -> bool:
         file: str = os.path.join(self.__dirName, self.__fileName)
