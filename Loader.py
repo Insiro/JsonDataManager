@@ -96,23 +96,23 @@ class Loader:
             command = exe[0].lower()
             if command == "insert":
                 while True:
-                    print("dataID : ", exe[1], "input 0 for cancel")
-                    path = input("dataID : ", exe[1], ", input json path : ")
+                    print("dataID : ", " ".join(exe[1:]), "input 0 for cancel")
+                    path = input("dataID : ", " ".join(exe[1:]), ", input json path : ")
                     if path == 0:
                         break
                     elif os.path.isfile(path):
                         with open(path, "r") as jfile:
-                            collection.insert(exe[1], jfile)
+                            collection.insert(" ".join(exe[1:]), jfile)
                             break
             elif command == "delete":
-                result = collection.delete(exe[1])
+                result = collection.delete(" ".join(exe[1:]))
                 print(result)
             elif command == "getnode":
                 dataID: str
                 if len(exe) == 1:
-                    dataID = input("input Data ID : ")
+                    dataID = input("input Data ID : ").strip()
                 else:
-                    dataID = exe[1]
+                    dataID = " ".join(exe[1:])
                 self.__nodeExcute(collection, collection.getNode(dataID))
             elif command == "drop":
                 collection.drop()
@@ -155,6 +155,12 @@ class Loader:
                 print("success" if node.load() else "fail")
             elif command == "command":
                 print("setData, commit, getData, load")
+            elif command == "getnode":
+                if len(exe) == 1:
+                    dataID = input("input Data ID : ").strip()
+                else:
+                    dataID = " ".join(exe[1:])
+                node = collection.getNode(dataID)
             else:
                 print("wrong command, for sea list type command")
 
@@ -170,17 +176,17 @@ class Loader:
                 print(self.getCollectionList())
             elif command == "load":
                 if len(args) < 2:
-                    collectionName = input("input collection Name")
+                    collectionName = input("input collection Name").strip()
                 else:
-                    collectionName = args[1]
+                    collectionName = " ".join(args[1:])
                 self.loadCollection(collectionName)
                 # load Collection
             elif command == "create":
-                self.createCollection(args[1])
+                self.createCollection(" ".join(args[1:]))
             elif command == "use":
-                self.__CollectionExcute(self.getCollection(args[1]))
+                self.__CollectionExcute(self.getCollection(" ".join(args[1:])))
             elif command == "release":
-                self.releaseCollection(args[1])
+                self.releaseCollection(" ".join(args[1:]))
             else:
                 print("wrong command, for sea list type command")
 
