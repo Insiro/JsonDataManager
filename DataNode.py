@@ -36,6 +36,15 @@ class DataNode:
     def updateData(self, data: dict):
         self.__data.update(data)
 
+    def updateOne(self, key: str, data: Union[str, dict]):
+        if type(data) == str:
+            if data[0] == "{" and data[-1] == "}":
+                data = json.loads(data.replace('\\"', '"'))
+            elif data[0] == "[" and data[-1] == "]":
+                data = '{ "data" : ' + data.replace('\\"', '"') + "}"
+                data = data["data"]
+        self.__data[key] = data
+
     def commit(self) -> bool:
         self.data["time"] = str(datetime.datetime.now())
         file: str = os.path.join(self.__dirName, self.__fileName + ".json")
