@@ -9,6 +9,7 @@ class Collection:
     __dirname: str = ""
     __collectionName: Union[str, None] = None
     __root: Any = None
+    __schema: Any = None
 
     def __init__(self, collectionName, baseRoot: str, generate=False):
         dirname = os.path.join(baseRoot, collectionName)
@@ -36,9 +37,15 @@ class Collection:
         filelist = os.listdir(self.__dirname)
         for file in filelist:
             if file[-5:] == ".json":
-                with open(os.path.join(self.__dirname, file), "r") as jsonfile:
-                    data = json.load(jsonfile)
-                    self.insert(data, file[:-5])
+                if file[:6] == ".schemna":
+                    with open(os.path.join(self.__dirname, file), "r") as jsonfile:
+                        self.__schema = DataNode(
+                            json.load(jsonfile), "schema", self.__dirname
+                        )
+                else:
+                    with open(os.path.join(self.__dirname, file), "r") as jsonfile:
+                        data = json.load(jsonfile)
+                        self.insert(data, file[:-5])
 
     def __rotate(self, direction: str, rotateRoot: DataNode):
         parent = rotateRoot.parent
@@ -99,6 +106,10 @@ class Collection:
         if self.__collectionName == None:
             print("Error : NULL collection")
             return None
+        if self.__schema != None:
+            data2 = self.__schema.getData()
+            data2.update(data)
+            data = data2
         node = DataNode(data, dataID, self.__dirname)
         if self.__root == None:
             self.__root = node
@@ -154,6 +165,9 @@ class Collection:
         del data
         self.__rebalance(parent.parent)
         return "success"
+
+    def getSchema(self) -> Union[DataNode, None]:
+        return self.__schema
 
     def getRoot(self) -> Union[DataNode, None]:
         return self.__root
