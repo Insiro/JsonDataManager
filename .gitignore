@@ -131,4 +131,6 @@ dmypy.json
 # Project
 .vscode/
 data/*
-!data/__init__.py
+data/*/
+test/
+log.*
