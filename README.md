@@ -17,12 +17,12 @@ you can set options of newDataRoot, DataRoot
 
 dataFolder
 
-> data folder
-> ├─data
-> │ ├─1.json
-> │ └─2.json
-> └─data2
-> ─ └─1.json
+> data folder  
+> ├─data  
+> │ ├─1.json  
+> │ └─2.json  
+> └─data2  
+> ─ └─1.json  
 
 ##### - DataRoot
 
