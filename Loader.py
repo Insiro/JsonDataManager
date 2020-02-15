@@ -4,6 +4,7 @@ from typing import Union, List
 import json
 
 from Collection import Collection
+from DataNode import DataNode
 
 
 class Loader:
@@ -87,106 +88,121 @@ class Loader:
                 return collection
         return None
 
-    def __CollectionExcute(self, collection):
-        if collection == None:
-            print("Null collection")
-            return
-        while True:
-            exe = input(collection.__str__() + "> ").strip().split(" ")
-            command = exe[0].lower()
-            if command == "insert":
-                while True:
-                    print("dataID : ", " ".join(exe[1:]), "input 0 for cancel")
-                    path = input("dataID : ", " ".join(exe[1:]), ", input json path : ")
-                    if path == 0:
-                        break
-                    elif os.path.isfile(path):
-                        with open(path, "r") as jfile:
-                            collection.insert(" ".join(exe[1:]), jfile)
-                            break
-            elif command == "delete":
-                result = collection.delete(" ".join(exe[1:]))
-                print(result)
-            elif command == "getnode":
-                dataID: str
-                if len(exe) == 1:
-                    dataID = input("input Data ID : ").strip()
-                else:
-                    dataID = " ".join(exe[1:])
-                self.__nodeExcute(collection, collection.getNode(dataID))
-            elif command == "drop":
-                collection.drop()
-            elif command == "list":
-                print(collection.getNames())
-            elif command == "exit":
-                return
-            elif command == "command":
-                print("insert, delete, getNode, drop, list, exit")
-            else:
-                print("wrong command, for sea list type command")
-
-    def __nodeExcute(self, collection, node):
-        if node == None:
-            print("Null node")
-            return
-        while True:
-            exe = (
-                input(collection.__str__() + ">" + node.__str__() + "> ")
-                .strip()
-                .split(" ")
-            )
-            command = exe[0].lower()
-            if command == "exit":
-                return
-            elif command == "setdata":
-                while True:
-                    path = input("insert your json file Path or 0: ")
-                    if path == 0:
-                        break
-                    elif os.path.isfile(path):
-                        with open(path, "r") as jfile:
-                            node.setData(json.load(jfile))
-                            break
-            elif command == "commit":
-                node.commit()
-            elif command == "getdata":
-                print(node.getData())
-            elif command == "load":
-                print("success" if node.load() else "fail")
-            elif command == "command":
-                print("setData, commit, getData, load")
-            elif command == "getnode":
-                if len(exe) == 1:
-                    dataID = input("input Data ID : ").strip()
-                else:
-                    dataID = " ".join(exe[1:])
-                node = collection.getNode(dataID)
-            else:
-                print("wrong command, for sea list type command")
-
     def cui(self):
+        cole: Union[Collection] = None
+        node: Union[DataNode] = None
         while True:
-            args = input(">").strip().split(" ")
+            output_string = (
+                (str(cole) if cole != None else "")
+                + " >"
+                + (str(node) + " > " if node != None else " ")
+            )
+            args = input(output_string).strip().split(" ")
+            option = " ".join(args[1:]).strip() if len(args) > 1 else ""
             command = args[0].lower()
             if command == "command":
-                print("exit, list, load, create, use, release")
+                print(
+                    "Global\t\t: exit, list, load, create, use, release"
+                    + "\nCollection\t: insert, delete, getNode, drop, nodelist, exit"
+                    + "\nNode\t\t: setData, commit, getData, load"
+                )
             elif command == "exit":
                 exit()
             elif command == "list":
                 print(self.getCollectionList())
             elif command == "load":
-                if len(args) < 2:
-                    collectionName = input("input collection Name").strip()
-                else:
-                    collectionName = " ".join(args[1:])
-                self.loadCollection(collectionName)
-                # load Collection
+                if option == "":
+                    option = input("input collection Name").strip()
+                if option == "" or option == "0":
+                    continue
+                self.loadCollection(option)
             elif command == "create":
-                self.createCollection(" ".join(args[1:]))
+                if option == "":
+                    option = input("input collection names or 0").strip()
+                if option == "" or option == "0":
+                    continue
+                self.createCollection(option)
             elif command == "use":
-                self.__CollectionExcute(self.getCollection(" ".join(args[1:])))
+                cole = self.getCollection(option)
+                node = None
             elif command == "release":
-                self.releaseCollection(" ".join(args[1:]))
+                if option == "" or option == "0":
+                    option = input("input collection name or 0").strip()
+                if option == "" or option == "0":
+                    continue
+                self.releaseCollection(option)
+            # Collection part
+            elif command == "insert":
+                if cole == None:
+                    print("NULL collection")
+                    continue
+                if option == "" or option == "0":
+                    did = input("input dataID : ").strip()
+                else:
+                    did = option
+                if did == "" or did == "0":
+                    print("NULL dataID")
+                    pass
+                path = input("dataID : " + did + ", input json path or 0: ").strip()
+                if path == 0 or path == "":
+                    continue
+                elif os.path.isfile(path):
+                    with open(path, "r", encoding="UTF-8") as jfile:
+                        cole.insert(did, jfile)
+                        break
+                else:
+                    print("wrong path, cancel")
+            elif command == "delete":
+                if cole == None:
+                    print("NULL collection")
+                result = cole.delete(option)
+                print(result)
+            elif command == "getnode":
+                if cole == None:
+                    print("NULL collection")
+                    continue
+                if option == "":
+                    option = input("input Data ID: ").strip()
+                node = cole.getNode(option)
+            elif command == "drop":
+                if cole == None:
+                    print("NULL collection")
+                    continue
+                cole.drop()
+            elif command == "nodelist":
+                if cole == None:
+                    print("NULL collection")
+                    continue
+                print(cole.getNames())
+            # Node part
+            elif command == "setdata":
+                if node == None:
+                    print("NULL Node")
+                    continue
+                elif option == "":
+                    option = input("insert your json file Path or 0: ")
+                if option == 0 or option == "":
+                    continue
+                elif os.path.isfile(option):
+                    with open(option, "r", encoding="UTF-8") as jfile:
+                        node.setData(json.load(jfile))
+                        continue
+            elif command == "commit":
+                if node == None:
+                    print("NULL Node")
+                    continue
+                node.commit()
+            elif command == "getdata":
+                if node == None:
+                    print("NULL Node")
+                    continue
+                print(node.getData())
+            elif command == "load":
+                if node == None:
+                    print("NULL Node")
+                    continue
+                print("success" if node.load() else "fail")
+
             else:
                 print("wrong command, for sea list type command")
 
