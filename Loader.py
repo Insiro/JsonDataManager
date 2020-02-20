@@ -11,6 +11,7 @@ class Loader:
     __newDataRoot: str
     __dataRoot: List[str]
     __collections: List[Collection]
+    __colnamnes: List[str]
 
     def __init__(self, runserver=False):
         with open("JDMconfig.json") as config:
@@ -18,6 +19,7 @@ class Loader:
             self.__newDataRoot = configlist["newDataRoot"]
             self.__dataRoot = configlist["dataRoot"]
             self.__collections = list()
+            self.__colnamnes = list()
 
     def getCollectionList(self) -> List[str]:
         r = list()
@@ -31,26 +33,34 @@ class Loader:
             return
         elif collectionName == "*":
             for item in os.listdir(self.__newDataRoot):
+                if item in self.__colnamnes:
+                    continue
                 dirname = os.path.join(self.__newDataRoot, item)
                 if os.path.isdir(dirname):
-                    self.__collections.append(
-                        Collection(
-                            baseRoot=self.__newDataRoot,
-                            collectionName=item,
-                            generate=False,
-                        )
+                    col = Collection(
+                        baseRoot=self.__newDataRoot,
+                        collectionName=item,
+                        generate=False,
                     )
+                    self.__collections.append(col)
+                    self.__colnamnes.append(str(col))
             for path in self.__dataRoot:
                 for item in os.listdir(path):
+                    if item in collectionName:
+                        continue
                     collectionPath = os.path.join(path, item)
                     if os.path.isdir(collectionPath):
-                        self.__collections.append(
-                            Collection(
-                                baseRoot=path, collectionName=item, generate=False,
-                            )
+                        col = Collection(
+                            baseRoot=
+                            path, collectionName=item, generate=False,
                         )
+                        self.__collections.append(col)
+                        self.__colnamnes.append(str(col))
             return
         collectionPath: str = os.path.join(self.__newDataRoot, collectionName)
+        if collectionName in self.__colnamnes:
+            print("duplicate Collection name")
+            return
         if os.path.isdir(collectionPath):
             self.__collections.append(
                 Collection(
@@ -175,18 +185,41 @@ class Loader:
                     continue
                 print(cole.getNames())
             # Node part
+            elif command == "update":
+                if node == None:
+                    print("NULL node")
+                    continue
+                print("input end for finish input")
+                data = ""
+                line = input("newDictData > ")
+                while line.lower() != "end":
+                    data += "\n" + line
+                    line = input("newDictData > ")
+                node.updateData(json.loads(data.replace('\\"', '"')))
             elif command == "setdata":
                 if node == None:
                     print("NULL Node")
                     continue
                 elif option == "":
-                    option = input("insert your json file Path or 0: ")
+                    option = input(
+                        "data option\n1: json path\n2 : use console line\n3 : cancel\t> "
+                    )
                 if option == 0 or option == "":
                     continue
-                elif os.path.isfile(option):
-                    with open(option, "r", encoding="UTF-8") as jfile:
-                        node.setData(json.load(jfile))
-                        continue
+                elif option == "1":
+                    if os.path.isfile(option):
+                        path = input("json path")
+                        with open(option, "r", encoding="UTF-8") as jfile:
+                            node.setData(json.load(jfile))
+                            continue
+                elif option == "2":
+                    print("input end for finish input")
+                    data = ""
+                    line = input("newDictData > ")
+                    while line.lower() != "end":
+                        data += "\n" + line
+                        line = input("newDictData > ")
+                    node.setData(json.loads(data.replace('\\"', '"')))
             elif command == "commit":
                 if node == None:
                     print("NULL Node")
@@ -202,7 +235,6 @@ class Loader:
                     print("NULL Node")
                     continue
                 print("success" if node.load() else "fail")
-
             else:
                 print("wrong command, for sea list type command")
 
