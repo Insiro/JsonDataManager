@@ -46,7 +46,7 @@ class DataNode:
         self.__data[key] = data
 
     def commit(self) -> bool:
-        self.data["time"] = str(datetime.datetime.now())
+        self.__data["time"] = str(datetime.datetime.now())
         file: str = os.path.join(self.__dirName, self.__fileName + ".json")
         try:
             with open(file, "w", encoding="UTF8") as jsonfile:
