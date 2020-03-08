@@ -20,64 +20,37 @@ class Loader:
             self.__dataRoot = configlist["dataRoot"]
             self.__collections = list()
             self.__colnamnes = list()
-
-    def getCollectionList(self) -> List[str]:
-        r = list()
-        for i in self.__collections:
-            r.append(i.__str__())
-        return r
+            if self.__newDataRoot not in self.__dataRoot:
+                self.__newDataRoot.insert(0, self.__newDataRoot)
 
     def loadCollection(self, collectionName: str):
-        if collectionName == "":
+        if collectionName == "" or collectionName == None:
             print("fail")
             return
         elif collectionName == "*":
-            for item in os.listdir(self.__newDataRoot):
-                if item in self.__colnamnes:
-                    continue
-                dirname = os.path.join(self.__newDataRoot, item)
-                if os.path.isdir(dirname):
-                    col = Collection(
-                        baseRoot=self.__newDataRoot,
-                        collectionName=item,
-                        generate=False,
-                    )
-                    self.__collections.append(col)
-                    self.__colnamnes.append(str(col))
             for path in self.__dataRoot:
                 for item in os.listdir(path):
-                    if item in collectionName:
-                        continue
                     collectionPath = os.path.join(path, item)
-                    if os.path.isdir(collectionPath):
+                    if os.path.isdir(collectionPath) and item not in self.__colnamnes:
+                        print(item)
                         col = Collection(
-                            baseRoot=
-                            path, collectionName=item, generate=False,
+                            baseRoot=path, collectionName=item, generate=False,
                         )
                         self.__collections.append(col)
                         self.__colnamnes.append(str(col))
             return
-        collectionPath: str = os.path.join(self.__newDataRoot, collectionName)
-        if collectionName in self.__colnamnes:
+        elif collectionName in self.__colnamnes:
             print("duplicate Collection name")
             return
-        if os.path.isdir(collectionPath):
-            self.__collections.append(
-                Collection(
-                    baseRoot=self.__newDataRoot,
-                    collectionName=collectionName,
-                    generate=False,
-                )
-            )
-            return
+        collectionPath: str = os.path.join(self.__newDataRoot, collectionName)
         for path in self.__dataRoot:
             collectionPath = os.path.join(path, collectionName)
             if os.path.isdir(collectionPath):
-                self.__collections.append(
-                    Collection(
-                        baseRoot=path, collectionName=collectionName, generate=False
-                    )
+                col = Collection(
+                    baseRoot=path, collectionName=collectionName, generate=False
                 )
+                self.__collections.append(col)
+                self.__colnamnes.append(col.__str__())
                 return
         print("Error : Not Exists collection")
 
@@ -119,7 +92,7 @@ class Loader:
             elif command == "exit":
                 exit()
             elif command == "list":
-                print(self.getCollectionList())
+                print(self.__colnamnes)
             elif command == "load":
                 if option == "":
                     option = input("input collection Name").strip()
@@ -237,4 +210,3 @@ class Loader:
                 print("success" if node.load() else "fail")
             else:
                 print("wrong command, for sea list type command")
-
