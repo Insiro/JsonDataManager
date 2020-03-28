@@ -149,7 +149,7 @@ class Collection:
             return "Error : Null Data"
         dataID: str = str(data)
         try:
-            os.remove("/" + self.__dirname + "/" + dataID + ".json")
+            os.remove(os.path.join(self.__dirname, dataID+".json") )
         except OSError:
             return "Error : remove File : " + dataID
         if not isinstance(data, DataNode):

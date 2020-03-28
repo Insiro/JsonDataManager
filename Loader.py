@@ -32,7 +32,6 @@ class Loader:
                 for item in os.listdir(path):
                     collectionPath = os.path.join(path, item)
                     if os.path.isdir(collectionPath) and item not in self.__colnamnes:
-                        print(item)
                         col = Collection(
                             baseRoot=path, collectionName=item, generate=False,
                         )
@@ -140,6 +139,8 @@ class Loader:
                     print("NULL collection")
                 result = cole.delete(option)
                 print(result)
+                if option==node.__str__ ()):
+                    self.node = None
             elif command == "getnode":
                 if cole == None:
                     print("NULL collection")
